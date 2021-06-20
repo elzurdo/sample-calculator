@@ -11,7 +11,7 @@ observed_success_percent = st.number_input('Audit Success Rate (in %)', value=98
 
 observed_success_rate = observed_success_percent / 100.
 
-sample_size = st.number_input('Audit Size', value=100, min_value=50,
+sample_size = st.number_input('Audit Size', value=100, min_value=100,
                               max_value=10000)
 
 mfpr_percent = st.number_input('Max False Positive Rate committed to (Max FPR) in (%)', value=1., min_value=0.01,max_value=5.)
