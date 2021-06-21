@@ -69,7 +69,7 @@ The result indicates that **Audit FPR** is **smaller** than **Max FPR**
                                     audit result **may NOT be considered safe**. 😦 
         
 **Reason**  
-The result indicates that the FPR is **larger** than the committed Max FPR 
+The result indicates that **Audit FPR** is **larger** than **Max FPR** 
 ({observation_result['false_rate'] * 100.:0.2f}%>{mfpr_rate * 100.:0.2f}%). 
 
 
