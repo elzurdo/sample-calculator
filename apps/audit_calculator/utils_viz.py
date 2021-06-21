@@ -48,16 +48,16 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
         plt.ylabel(ylabel)
 
 
-def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm"):
+def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True):
     plot_success_rates(audit_success_rate * audit_size,
                      (1 - audit_success_rate) * audit_size,
                      ci_fraction=ci_fraction, ci_label=f"Jeffreys {ci_fraction * 100.:0.1f}% CI", label="Beta Distribution", ci_type=ci_type,
-                       xlabel="model success rate")
+                       xlabel="model success rate", display_ci=display_ci)
 
     # Agresti-Coull
-    ac_min, ac_max = agresti_coull_interval_min_max(audit_success_rate, audit_size, z=Z_QUANTILE_ERRORRATE)
-
-    plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
+    if ac_display:
+        ac_min, ac_max = agresti_coull_interval_min_max(audit_success_rate, audit_size, z=Z_QUANTILE_ERRORRATE)
+        plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
 
     plt.legend(title=legend_title)
     plt.title(f"Audit success rate {audit_success_rate * 100:0.0f}%, Audit Size={audit_size:,}")

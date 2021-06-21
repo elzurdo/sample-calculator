@@ -6,6 +6,16 @@ from utils_viz import plot_success_rates_methods, \
 
 from utils_stats import observed_success_correctness, SUCCESS_RATE_BOUNDARY
 
+"""
+# Audit Result Interpreter  
+
+We address the question: 
+“Given an Audit Size with an Audit Safety Rate, if I determine this model to be safe, how correct (or wrong!) would this decision be?”
+
+Provide the **Audit Size**, **Audit Safety Rate** and **Max FPR** (defined below) to find out if the model that generated this sample result may be considered safe (within the agreed **Max FPR**).
+"""
+
+
 ci_fraction = 0.95
 observed_success_percent = st.number_input('Audit Success Rate (in %)', value=98., min_value=0.01,max_value=99.)
 
