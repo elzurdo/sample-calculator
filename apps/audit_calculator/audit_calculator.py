@@ -36,9 +36,9 @@ mfpr_rate = mfpr_percent / 100.
 
 less_equal = r"""$$\le$$"""
 text_short_mfpr = f"""
-*A model is determined safe if the **Audit FPR**{less_equal}{mfpr_percent:0.2f}%.   
-This guarantees that for every 1,000 similar decisions (of "this model is safe"), we consider a maximum of
-{mfpr_rate * 1000.:0.0f} incorrect decisions to be acceptable.*
+*A model is passes >{success_rate_boundary*100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_percent:0.2f}%.   
+This guarantees that for every 1,000 similar pass decisions, we consider a maximum of
+{mfpr_rate * 1000.:0.0f} incorrect (<{success_rate_boundary*100.:0.1f}% safe) decisions to be acceptable.*
 """
 
 text_short_mfpr
@@ -66,7 +66,7 @@ if boundary_success_bool:
     if mfpr_success_bool:
         # with a FPR smaller than the maximum
         audit_result_str = f""" The model that generated this 
-                            audit result **may be considered safe**! 🎉🎈🎊 
+                            audit result **may be considered >{success_rate_boundary*100.:0.1f}% safe**! 🎉🎈🎊 
 
 **Reason**  
 The result indicates that **Audit FPR** is **smaller** than **Max FPR** 
@@ -77,17 +77,16 @@ The result indicates that **Audit FPR** is **smaller** than **Max FPR**
         # with a FPR smaller than the maximum
 
         audit_result_str = f""" The model that generated this 
-                                    audit result **may NOT be considered >{success_rate_boundary*100.:0.1f}%  safe**. 😦 
+                                    audit result **may NOT be considered >{success_rate_boundary*100.:0.1f}% safe**. 😦 
         
 **Reason**  
 The result indicates that **Audit FPR** is **larger** than **Max FPR** 
 ({observation_result['false_rate'] * 100.:0.2f}%>{mfpr_rate * 100.:0.2f}%). 
 
-
 Passing this model as >{success_rate_boundary*100.:0.1f}% safe would risk increasing the FPR to above the committed {mfpr_rate * 100.:0.2f}% (i.e, letting more <{success_rate_boundary*100.:0.1f}% models pass).
 
 **Suggested Actions**  
-* Explore the reason for the low safety rate and fix the model.  
+* Explore the reason for the relatively low safety rate and fix the model.  
 * Collect more annotated cases for further justification. Note that the Max FPR must remain at {mfpr_rate * 100.:0.2f}% or lower.  
 """
 else:
@@ -99,7 +98,7 @@ else:
 The Audit Success Rate of {observed_success_rate * 100:0.1f}%  is lower than the threshold of {success_rate_boundary * 100:0.1f}%.  😱 
 
 **Suggested Action**  
-Explore the reason for the low safety rate and fix the model. 
+Explore the reason for the relatively low safety rate and fix the model. 
 
 """
 
@@ -127,13 +126,15 @@ interpretation_boundary_success_text
 
 text_expanded_mfpr = f"""
 By committing to a **Max False Positive Rate (Max FPR)** of 
-{mfpr_percent}%, results with with a higher **Audit FPR** will be considered not safe. 
+{mfpr_percent}%, results with with a higher **Audit FPR** will not be considered >{success_rate_boundary*100.:0.1f}% safe and hence fail. 
 
-This commitment guarantees that for every 1,000 audits, we should expect and average of 
+This ensures that that we mitigate the risk at accepting models relatively lower safety rates than {success_rate_boundary*100.:0.1f}%.
+
+E.g, this commitment guarantees that for every 1,000 audits, we should expect and average of 
 {mfpr_rate * 1000.:0.1f} to be False Positives.
 """
 
-with st.beta_expander("""Why should we commit to Max FPR?"""):
+with st.beta_expander("""Why should we commit to Max FPR? Answer - Risk Mitigation"""):
     st.write(text_expanded_mfpr)
 
 
