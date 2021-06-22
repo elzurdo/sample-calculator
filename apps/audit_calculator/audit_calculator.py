@@ -6,13 +6,19 @@ from utils_viz import plot_success_rates_methods, \
 
 from utils_stats import observed_success_correctness, SUCCESS_RATE_BOUNDARY
 
-"""
+success_rate_boundary = st.sidebar.number_input('Model Min Success Rate', value=0.93, min_value=0.9,
+                                     max_value=0.99)
+
+
+f"""
 # Audit Result Interpreter  
 
 We address the question: 
-“Given an Audit Size with an Audit Safety Rate, if I determine this model to be safe, how correct (or wrong!) would this decision be?”
+“Given an Audit Size with an Audit Safety Rate, if I determine this model to be >{success_rate_boundary*100.:0.1f}% safe, how correct (or wrong!) would this decision be?”
 
-Provide the **Audit Size**, **Audit Safety Rate** and **Max FPR** (defined below) to find out if the model that generated this sample result may be considered safe (within the agreed **Max FPR**).
+
+### Instructions  
+Provide the **Audit Size**, **Audit Safety Rate** and **Risk Factor** (defined below) to find out if the model that generated this sample result may be considered >{success_rate_boundary*100.:0.1f}% safe.
 """
 
 
@@ -24,7 +30,7 @@ observed_success_rate = observed_success_percent / 100.
 sample_size = st.number_input('Audit Size', value=100, min_value=100,
                               max_value=10000)
 
-mfpr_percent = st.number_input('Max False Positive Rate committed to (Max FPR) in (%)', value=1., min_value=0.01,max_value=5.)
+mfpr_percent = st.number_input('Risk Factor: Max False Positive Rate committed to (Max FPR) in (%)', value=1., min_value=0.01,max_value=5.)
 mfpr_rate = mfpr_percent / 100.
 
 
@@ -36,11 +42,6 @@ This guarantees that for every 1,000 similar decisions (of "this model is safe")
 """
 
 text_short_mfpr
-
-
-success_rate_boundary = st.sidebar.number_input('Model Min Success Rate', value=0.93, min_value=0.9,
-                                     max_value=0.99)
-
 
 
 with st.beta_expander('Visualise Result'):
@@ -76,29 +77,29 @@ The result indicates that **Audit FPR** is **smaller** than **Max FPR**
         # with a FPR smaller than the maximum
 
         audit_result_str = f""" The model that generated this 
-                                    audit result **may NOT be considered safe**. 😦 
+                                    audit result **may NOT be considered >{success_rate_boundary*100.:0.1f}%  safe**. 😦 
         
 **Reason**  
 The result indicates that **Audit FPR** is **larger** than **Max FPR** 
 ({observation_result['false_rate'] * 100.:0.2f}%>{mfpr_rate * 100.:0.2f}%). 
 
 
-Considering this model as "safe" would risk increasing the FPR to above the committed {mfpr_rate * 100.:0.2f}% (i.e, letting more unsafe models pass).
+Passing this model as >{success_rate_boundary*100.:0.1f}% safe would risk increasing the FPR to above the committed {mfpr_rate * 100.:0.2f}% (i.e, letting more <{success_rate_boundary*100.:0.1f}% models pass).
 
 **Suggested Actions**  
-* Explore the reason for the high unsafe rate and fix the model.  
+* Explore the reason for the low safety rate and fix the model.  
 * Collect more annotated cases for further justification. Note that the Max FPR must remain at {mfpr_rate * 100.:0.2f}% or lower.  
 """
 else:
     str_over_under = """**equal or under**"""
     observed_fpr = observation_result['true_rate']
-    audit_result_str = f"""The model that generated the audit sample **may not be considered safe**. 😦   
+    audit_result_str = f"""The model that generated the audit sample **may not be considered >{success_rate_boundary*100.:0.1f}% safe**. 😦   
 
 **Reason**  
 The Audit Success Rate of {observed_success_rate * 100:0.1f}%  is lower than the threshold of {success_rate_boundary * 100:0.1f}%.  😱 
 
 **Suggested Action**  
-Explore the reason for the high unsafe rate and fix the model. 
+Explore the reason for the low safety rate and fix the model. 
 
 """
 

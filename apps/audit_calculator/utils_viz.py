@@ -51,7 +51,7 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
 def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True):
     plot_success_rates(audit_success_rate * audit_size,
                      (1 - audit_success_rate) * audit_size,
-                     ci_fraction=ci_fraction, ci_label=f"Jeffreys {ci_fraction * 100.:0.1f}% CI", label="Beta Distribution", ci_type=ci_type,
+                     ci_fraction=ci_fraction, ci_label=f"Jeffreys {ci_fraction * 100.:0.1f}% CI", label="Posterior", ci_type=ci_type,
                        xlabel="model success rate", display_ci=display_ci)
 
     # Agresti-Coull
