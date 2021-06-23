@@ -71,8 +71,6 @@ def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, 
 
     if generator_success_rates is None:
         d_generator_success, generator_success_rates = get_success_rates()
-        #d_generator_success = 0.00001  # this determines how accurate the audit_success_rate=99% results are. more zeros: more accurrate but slower
-        #model_success_rates = np.arange(0., 1., d_generator_success)
 
     model_success_pdf = true_rate_posterior(observed_success_rate, sample_size,
                                             generator_success_rates, min_ab=0.5,
