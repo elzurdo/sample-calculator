@@ -183,6 +183,7 @@ def hdi_ci_full_width(p, n, ci_fraction=0.95):
     ci_min, ci_max = HDIofICDF(beta, a=a, b=b, ci_fraction=ci_fraction)
     return ci_max - ci_min
 
+
 def sample_size_success_precision(d_sample_size = 10, min_size = 20, max_size = 1000, d_success = 0.05, min_success = 0.5, max_success = 1.):
 
     if 1. == max_success:
@@ -205,3 +206,20 @@ def sample_size_success_precision(d_sample_size = 10, min_size = 20, max_size = 
     df_precision.index.name = "audit_size"
 
     return df_precision
+
+
+def accuracy_sample_size(benchmark_success_rate = 0.8, accuracy_goal = 0.10, d_sample_size = 10, min_size = 20, max_size = 1000):
+    sample_sizes = np.arange(min_size, max_size + d_sample_size, d_sample_size)
+
+    goal_reached = None
+    for sample_size in sample_sizes:
+        this_precision = hdi_ci_full_width(benchmark_success_rate, sample_size)
+
+        if this_precision <= accuracy_goal:
+            goal_reached = True
+            break
+
+    if goal_reached:
+        return {"sample_size": sample_size, "accuracy": this_precision}
+    else:
+        return None
