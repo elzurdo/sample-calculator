@@ -6,6 +6,7 @@ from utils_stats import (agresti_coull_interval_min_max,
                          CI_FRACTION,
                          CI_TYPE,
                          get_success_rates,
+                         sample_size_success_precision,
                          successes_failures_to_ci_min_max,
                          SUCCESS_RATE_BOUNDARY,
                          test_value,
@@ -111,3 +112,41 @@ def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, 
     ylim = ax.get_ylim()
     plt.vlines(success_rate_boundary, 0, ylim[-1], color="gray", linestyle="--",
                linewidth=4, alpha=0.5)
+
+def plot_metric_accuracy(precisions = [0.05, 0.06, 0.07, 0.08, 0.09, 0.1], d_sample_size = 10, min_size = 20, max_size = 1000, d_success = 0.05, min_success = 0.5, max_success = 1.):
+    df_precision = sample_size_success_precision(d_sample_size=d_sample_size, min_size=min_size, max_size=max_size,
+                                  d_success=d_success, min_success=min_success, max_success=max_success)
+
+    for precision in precisions:
+        success_plot = []
+
+        min_audit_sizes = []
+        for success_rate in df_precision:
+            df_aux = df_precision[df_precision[success_rate] <= precision][success_rate]
+
+            if len(df_aux) > 0:
+                min_size = \
+                df_precision[df_precision[success_rate] <= precision][success_rate].index[0]
+                min_audit_sizes.append(min_size)
+                success_plot.append(success_rate)
+
+        plt.plot(success_plot, min_audit_sizes, '-o', label=f"{precision * 100:0.01f}%",
+                 linewidth=precision * 100 - 4., alpha=0.7)
+
+        if (precision == precisions[0]) | (precision == precisions[-1]):
+            for success_rate, audit_size in zip(success_plot, min_audit_sizes):
+                plt.annotate(f"{audit_size:,}", xy=[success_rate, audit_size + 10],
+                             alpha=0.3)
+        else:
+            plt.annotate(f"{min_audit_sizes[0]:,}",
+                         xy=[success_plot[0], min_audit_sizes[0] + 10], alpha=0.3)
+
+    plt.legend(title="accuracy (95% CI)", bbox_to_anchor=(1, 1))
+    plt.xlabel("success rate")
+    plt.ylabel("audit size")
+
+    ax = plt.gca()
+    # grid
+    ax.grid(alpha=0.3)
+    plt.ylim(0, 1000)
+    plt.xlim(0.49, 1.)

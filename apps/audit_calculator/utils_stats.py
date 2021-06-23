@@ -2,6 +2,7 @@ import numpy as np
 
 from scipy.optimize import fmin
 from scipy.stats import beta
+import pandas as pd
 
 CI_FRACTION = 0.95
 CI_TYPE = "HDI"
@@ -173,3 +174,34 @@ def multiple_observed_successes_correctness(sample_size, all_observed_success_ra
         success_correctness[observed_success_rate] = rates
 
     return success_correctness
+
+
+def hdi_ci_full_width(p, n, ci_fraction=0.95):
+    a = p * n
+    b = n - a
+
+    ci_min, ci_max = HDIofICDF(beta, a=a, b=b, ci_fraction=ci_fraction)
+    return ci_max - ci_min
+
+def sample_size_success_precision(d_sample_size = 10, min_size = 20, max_size = 1000, d_success = 0.05, min_success = 0.5, max_success = 1.):
+
+    if 1. == max_success:
+        # script does not work for success = 1.
+        max_success -= d_success
+
+    sample_sizes = np.arange(min_size, max_size + d_sample_size, d_sample_size)
+
+    success_rates = np.arange(min_success, max_success + d_success, d_success)
+
+    rate_to_precision = {}
+
+    for success_rate in success_rates:
+        rate_to_precision[success_rate] = list(
+            map(lambda size: hdi_ci_full_width(success_rate, size), sample_sizes))
+
+    df_precision = pd.DataFrame(rate_to_precision)
+    df_precision.index = sample_sizes
+    df_precision.columns.name = "success_rate"
+    df_precision.index.name = "audit_size"
+
+    return df_precision
