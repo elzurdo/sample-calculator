@@ -8,15 +8,16 @@ from utils_viz import plot_success_rates_methods, \
 from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY
 
 
-stage_planning = "Planning"
-stage_interpreting = "Interpreting"
+stage_planning = "Plan an Audit Budget"
+stage_interpreting = "Interpret Audit Results"
 
-audit_stage =  st.sidebar.radio('Audit', [stage_planning, stage_interpreting], index=1)
+audit_stage =  st.sidebar.selectbox('I am looking to', [stage_planning, stage_interpreting], index=1)
 
-option_accuracy = f"{audit_stage} Accuracy"
-option_clearance = f"{audit_stage} Clearance"
+option_accuracy = "for Accuracy"
+option_clearance = "for Passing a Success Rate"
 
-calculator_type = st.sidebar.radio('Calculator', [option_accuracy, option_clearance], index=1)
+calculator_type = st.sidebar.selectbox('Calculator Type', [option_accuracy, option_clearance], index=1)
+
 
 if option_accuracy == calculator_type:
     if stage_planning == audit_stage:
@@ -25,10 +26,10 @@ if option_accuracy == calculator_type:
         # Audit Accuracy Planner  
     
         We address the question:
-        “What is the minimum **Audit Size** necessary to determine a metric's value?“ 
+        “What is the minimum **Audit Size** necessary to determine a **Success Rate** value?“ 
     
-        Two value are required to determine the **Audit Size**:
-        * **Accuracy** - The more accurate the result, the larger the sample size required. 
+        Two values are required to determine the **Audit Size**:
+        * **Goal Accuracy** - The more accurate the result, the larger the sample size required. 
         * **Baseline Success Rate** - The expected metric value. The closer this expected value is to 50% the larger the sample size required.
         """
 
@@ -44,10 +45,10 @@ if option_accuracy == calculator_type:
 
             """    
             ### Instructions  
-    ⬅️ On the left hand panel provide the **Expected Success Rate** and **Goal Accuracy** to find out the minimum **Audit Size**.
+    ⬅️ On the left hand panel provide the **Baseline Success Rate** expected and **Goal Accuracy** to find out the minimum **Audit Size**.
     """
 
-            benchmark_percent = st.sidebar.number_input('Expected Success Rate (%)', value=80.,
+            benchmark_percent = st.sidebar.number_input('Baseline Success Rate (%)', value=80.,
                                                     min_value=50.,
                                                     max_value=99.)
             benchmark = benchmark_percent/100.
@@ -58,7 +59,8 @@ if option_accuracy == calculator_type:
 
             result = accuracy_sample_size(benchmark_success_rate=benchmark, accuracy_goal=accuracy_goal)
 
-            f"""An **Audit Size** of size {result['sample_size']} will result in a measurement of {benchmark_percent}% with {result['accuracy'] * 100.:0.1f}% accuracy."""
+            f"""### Result   
+An minimum **Audit Size** of {result['sample_size']} is required to measure a **Success Rate** of {benchmark_percent}% within {result['accuracy'] * 100.:0.1f}% **Accuracy**."""
 
             success = result['sample_size'] * benchmark
             failure = result['sample_size'] - success
@@ -77,7 +79,7 @@ if option_accuracy == calculator_type:
 
         str_explanation = f"""
         * **Accuracy** - The 95% Credible Interval using the High Density Interval method.
-        * **Baseline Success Rate** - This assumes metrics that are binary in nature (only has value "success", "failure") and follow a Bernoulli distribution.
+        * **Success Rate** - This assumes metrics that are binary in nature (only has value "success", "failure") and follow a Bernoulli distribution.
         """
 
         with st.beta_expander('Definitions'):
@@ -90,14 +92,14 @@ if option_accuracy == calculator_type:
 
 elif option_clearance == calculator_type:
 
-    success_rate_boundary_percent = st.sidebar.number_input('Model Min Success Rate',
+    success_rate_boundary_percent = st.sidebar.number_input('Model Min Success Rate (%)',
                                                             value=93.0, min_value=90.,
                                                             max_value=99.)
 
     success_rate_boundary = success_rate_boundary_percent / 100.
 
     ci_fraction = 0.95
-    observed_success_percent = st.sidebar.number_input('Audit Success Rate (in %)',
+    observed_success_percent = st.sidebar.number_input('Audit Success Rate (%)',
                                                        value=98., min_value=0.01,
                                                        max_value=99.)
 
@@ -118,16 +120,16 @@ elif option_clearance == calculator_type:
         # Audit Result Interpreter  
         
         We address the question: 
-        “Given an **Audit Size** with an **Audit Safety Rate**, if I determine this model to be >{success_rate_boundary*100.:0.1f}% safe, how correct (or wrong!) would this decision be?”
+        “Given an **Audit Size** with an **Audit Safety Rate**, if I determine the generating model to be >{success_rate_boundary*100.:0.1f}% safe, how correct (or wrong!) would this decision be?”
         
         
         ### Instructions  
-        ⬅️ On the left hand panel provide the **Audit Size**, **Audit Safety Rate** and **Risk Factor** to find out if the model that generated this sample result may be considered >{success_rate_boundary*100.:0.1f}% safe.
+        ⬅️ Please provide on the left hand panel the **Audit Size**, **Audit Safety Rate** and **Risk Factor** to find out if the model that generated this sample result may be considered >{success_rate_boundary*100.:0.1f}% safe.
         """
 
 
-        text_short_mfpr = f"""
-        *A model passes >{success_rate_boundary*100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_percent:0.2f}%.   
+        text_short_mfpr = f"""### Explanation
+*A model passes >{success_rate_boundary*100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_percent:0.2f}%.   
         This guarantees, e.g, that for every 1,000 similar pass decisions, we consider a maximum of
         {mfpr_rate * 1000.:0.0f} incorrect decisions (of {less_equal}{success_rate_boundary*100.:0.1f}% safe) to be acceptable.*
         """
@@ -154,7 +156,7 @@ elif option_clearance == calculator_type:
                                     audit result **may be considered >{success_rate_boundary*100.:0.1f}% safe**! 🎉🎈🎊 
         
         **Reason**  
-        The result indicates that **Audit FPR** is **smaller** than **Max FPR** 
+        **Audit FPR** is **smaller** than the **Risk Factor** 
                                     ({observation_result['false_rate']* 100.:0.2f}% 
                                     {less_equal}{mfpr_rate * 100.:0.2f}%). 
                                     """
