@@ -50,9 +50,15 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
 
 
 def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True):
+    ci_type_str = "High Density"
+    if "ET" == ci_type_str:
+        ci_type_str = "Jeffreys"
+
+
+
     plot_success_rates(audit_success_rate * audit_size,
                      (1 - audit_success_rate) * audit_size,
-                     ci_fraction=ci_fraction, ci_label=f"Jeffreys {ci_fraction * 100.:0.1f}% CI", label="Posterior", ci_type=ci_type,
+                     ci_fraction=ci_fraction, ci_label=f"{ci_type_str} {ci_fraction * 100.:0.1f}% CI", label="Posterior", ci_type=ci_type,
                        xlabel="model success rate", display_ci=display_ci)
 
     # Agresti-Coull
@@ -61,7 +67,7 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
         plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
 
     plt.legend(title=legend_title)
-    plt.title(f"Audit success rate {audit_success_rate * 100:0.0f}%, Audit Size={audit_size:,}")
+    plt.title(f"Audit success rate {audit_success_rate * 100:0.1f}%, Audit Size={audit_size:,}")
 
     ax = plt.gca()
     #grid
@@ -92,11 +98,26 @@ def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, 
     pdf_negative = [pdf_ for idx, pdf_ in enumerate(model_success_pdf) if
                     ~positive_bools[idx]]
 
+    if true_positive_rate > 0.999:
+        tpr_str = ">99.9%"
+        fpr_str = "<0.1%"
+    else:
+        tpr_str = f"{true_positive_rate * 100:0.1f}%"
+        fpr_str = f"{(1. - true_positive_rate) * 100:0.1f}%"
+
+    if observed_success_rate > success_rate_boundary:
+        right_weight_str, right_color = "True Positive", 'lightgreen'
+        left_weight_str, left_color = "False Positive", 'darkred'
+    else:
+        right_weight_str, right_color = "False Negative", 'orange'
+        left_weight_str, left_color = "True Negative", 'lightblue'
+
+
     plt.plot(generator_success_rates, model_success_pdf, color="purple", linewidth=3)
-    plt.fill_between(idxs_positive, pdf_positive, color='lightgreen', alpha=0.4,
-                     label=f"True Positive {true_positive_rate * 100:0.1f}%")
-    plt.fill_between(idxs_negative, pdf_negative, color='darkred', alpha=0.4,
-                     label=f"False Positive {(1. - true_positive_rate) * 100:0.1f}%",
+    plt.fill_between(idxs_positive, pdf_positive, color=right_color, alpha=0.4,
+                     label=f"{right_weight_str} {tpr_str}")
+    plt.fill_between(idxs_negative, pdf_negative, color=left_color, alpha=0.4,
+                     label=f"{left_weight_str} {fpr_str}",
                      hatch="x")
 
     plt.title(

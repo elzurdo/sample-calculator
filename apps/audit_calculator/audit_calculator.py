@@ -6,7 +6,7 @@ from utils_viz import plot_success_rates_methods, \
     plot_metric_accuracy, plot_success_rates
 
 from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY
-
+import utils_text
 
 stage_planning = "Plan an Audit Budget"
 stage_interpreting = "Interpret Audit Results"
@@ -16,7 +16,12 @@ audit_stage =  st.sidebar.selectbox('I am looking to', [stage_planning, stage_in
 option_accuracy = "for Accuracy"
 option_clearance = "for Passing a Success Rate"
 
-calculator_type = st.sidebar.selectbox('Calculator Type', [option_accuracy, option_clearance], index=1)
+if stage_planning == audit_stage:
+    calculator_types = [option_accuracy]
+elif stage_interpreting == audit_stage:
+    calculator_types = [option_clearance]
+
+calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=0)
 
 
 if option_accuracy == calculator_type:
@@ -113,28 +118,11 @@ elif option_clearance == calculator_type:
         max_value=5.)
     mfpr_rate = mfpr_percent / 100.
 
-    less_equal = r"""$$\le$$"""
+
 
     if stage_interpreting == audit_stage:
-        f"""
-        # Audit Result Interpreter  
-        
-        We address the question: 
-        “Given an **Audit Size** with an **Audit Safety Rate**, if I determine the generating model to be >{success_rate_boundary*100.:0.1f}% safe, how correct (or wrong!) would this decision be?”
-        
-        
-        ### Instructions  
-        ⬅️ Please provide on the left hand panel the **Audit Size**, **Audit Safety Rate** and **Risk Factor** to find out if the model that generated this sample result may be considered >{success_rate_boundary*100.:0.1f}% safe.
-        """
-
-
-        text_short_mfpr = f"""### Explanation
-*A model passes >{success_rate_boundary*100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_percent:0.2f}%.   
-        This guarantees, e.g, that for every 1,000 similar pass decisions, we consider a maximum of
-        {mfpr_rate * 1000.:0.0f} incorrect decisions (of {less_equal}{success_rate_boundary*100.:0.1f}% safe) to be acceptable.*
-        """
-
-        st.sidebar.write(text_short_mfpr)
+        st.write(utils_text.interpret_pass_header(success_rate_boundary))
+        st.sidebar.write(utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate))
 
 
 
@@ -152,61 +140,25 @@ elif option_clearance == calculator_type:
 
             if mfpr_success_bool:
                 # with a FPR smaller than the maximum
-                audit_result_str = f""" The model that generated this 
-                                    audit result **may be considered >{success_rate_boundary*100.:0.1f}% safe**! 🎉🎈🎊 
-        
-        **Reason**  
-        **Audit FPR** is **smaller** than the **Risk Factor** 
-                                    ({observation_result['false_rate']* 100.:0.2f}% 
-                                    {less_equal}{mfpr_rate * 100.:0.2f}%). 
-                                    """
+                audit_result_str = utils_text.risk_success(success_rate_boundary, observation_result, mfpr_rate)
             else:
                 # with a FPR smaller than the maximum
 
-                audit_result_str = f""" The model that generated this 
-                                            audit result **may NOT be considered >{success_rate_boundary*100.:0.1f}% safe**. 😦 
-                
-        **Reason**  
-        The result indicates that **Audit FPR** is **larger** than **Max FPR** 
-        ({observation_result['false_rate'] * 100.:0.2f}%>{mfpr_rate * 100.:0.2f}%). 
-        
-        Passing this model as >{success_rate_boundary*100.:0.1f}% safe would risk increasing the FPR to above the committed {mfpr_rate * 100.:0.2f}% (i.e, letting more <{success_rate_boundary*100.:0.1f}% models pass).
-        
-        **Suggested Actions**  
-        * Explore the reason for the relatively low safety rate and fix the model.  
-        * Collect more annotated cases for further justification. Note that the Max FPR must remain at {mfpr_rate * 100.:0.2f}% or lower.  
-        """
+                audit_result_str = utils_text.risk_fail(success_rate_boundary, observation_result, mfpr_rate)
         else:
             str_over_under = """**equal or under**"""
             observed_fpr = observation_result['true_rate']
-            audit_result_str = f"""The model that generated the audit sample **may not be considered >{success_rate_boundary*100.:0.1f}% safe**. 😦   
-        
-        **Reason**  
-        The Audit Success Rate of {observed_success_rate * 100:0.1f}%  is lower than the threshold of {success_rate_boundary * 100:0.1f}%.  😱 
-        
-        **Suggested Action**  
-        Explore the reason for the relatively low safety rate and fix the model. 
-        
-        """
+            audit_result_str = utils_text.thresh_fail(success_rate_boundary, observed_success_rate)
+
+        text_result = utils_text.results(success_rate_boundary, sample_size, observed_success_rate, observed_fpr, str_over_under)
 
 
+        interpretation_boundary_success_text = \
+            f"""### Result Interpretation 
+{text_result}   
 
-        interpretation_boundary_success_text = f"""  
-        **Result**   
-        An audit of size 
-        {sample_size} 
-        with a success rate of 
-        {observed_success_rate * 100:0.1f}% 
-        has an **Audit FPR** of 
-        {observed_fpr * 100:0.1f}%. In other words, there is a  {(1.-observed_fpr) * 100:0.1f}%
-        probability that this sample was generated by a model with a success rate of {str_over_under} 
-        {success_rate_boundary * 100:0.1f}%.
-        
-        **Conclusion**   
-        {audit_result_str}
-        
-        
-        """
+**Conclusion**  
+{audit_result_str}  """
 
         interpretation_boundary_success_text
 
@@ -219,8 +171,8 @@ elif option_clearance == calculator_type:
 
         if show_visual:
             st.sidebar.write(viz_text)
-            ac_display = st.sidebar.checkbox('AC 95% Confidence Interval', value=False)
-            display_ci = st.sidebar.checkbox('HDI 95% Credible Interval', value=False)
+            ac_display = st.sidebar.checkbox('Agresti-Coull 95% CI', value=False)
+            display_ci = st.sidebar.checkbox('High Density 95% Credible Interval', value=False)
 
             plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=success_rate_boundary)
             plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci)
@@ -240,7 +192,6 @@ elif option_clearance == calculator_type:
     E.g, this commitment guarantees that for every 1,000 audits, we should expect and average of 
     {mfpr_rate * 1000.:0.1f} to be False Positives.
     """
-
 
 
     with st.beta_expander("""Risk mitigation by Max FPR"""):
