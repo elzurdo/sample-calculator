@@ -199,3 +199,8 @@ elif option_clearance == calculator_type:
         st.write(text_expanded_mfpr)
 
 
+"""
+Created by: [Eyal Kazin](https://www.linkedin.com/in/eyal-kazin-0b96227a/)  
+"""
+
+
