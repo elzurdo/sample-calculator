@@ -5,6 +5,7 @@ def interpret_pass_header(success_rate_boundary):
     text = \
     f"""
     # Audit Result Interpreter 🧮 
+    **Got data? Use this calculator to draw conclusions.**
 
     This **Interpreter** calculator addresses the question:   
     “Given an **Audit Size** with an **Audit Safety Rate**, if I determine the generating model to be >{success_rate_boundary * 100.:0.1f}% safe, how correct (or wrong!) would this decision be?”
@@ -18,9 +19,10 @@ def interpret_pass_header(success_rate_boundary):
 
 def risk_factor_explanation(success_rate_boundary, mfpr_rate):
     text = f"""### Explanation
-*A model passes >{success_rate_boundary * 100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_rate * 100:0.2f}%.   
-This guarantees, e.g, that for every 1,000 similar pass decisions, we consider a maximum of
-{mfpr_rate * 1000.:0.0f} incorrect decisions to be acceptable. (I.e, those of models that are {less_equal}{success_rate_boundary * 100.:0.1f}% safe)*
+*A model passes >{success_rate_boundary * 100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_rate * 100:0.2f}%.*   
+
+*This guarantees, e.g, that for every 1,000 similar audits, we consider a maximum of
+{mfpr_rate * 1000.:0.0f} **incorrect** "model pass decisions" to be acceptable. (I.e,  models that are actually {less_equal}{success_rate_boundary * 100.:0.1f}% safe)*
 """
 
     return text

@@ -28,9 +28,11 @@ if option_accuracy == calculator_type:
     if stage_planning == audit_stage:
 
         f"""
-        # Audit Accuracy Planner  
+        # Audit Accuracy Planner 📐💰 
     
-        We address the question:
+        **Plan your budget based on the desired accuracy.**   
+        
+        This calculator addresses the question:  
         “What is the minimum **Audit Size** necessary to determine a **Success Rate** value?“ 
     
         Two values are required to determine the **Audit Size**:
@@ -38,9 +40,9 @@ if option_accuracy == calculator_type:
         * **Baseline Success Rate** - The expected metric value. The closer this expected value is to 50% the larger the sample size required.
         """
 
-        planning_plug = "Plug In Values"
-        planning_all = "View All Value Results (takes about 10 seconds)"
-        explore_mode = st.selectbox('Explore', [planning_plug, planning_all])
+        planning_plug = "Explore one scenario plug in"
+        planning_all = "View all scenarios (takes about 10 seconds)"
+        explore_mode = st.selectbox('One option or many?', [planning_plug, planning_all])
 
         if planning_all == explore_mode:
             plot_metric_accuracy(d_sample_size=10)
@@ -65,7 +67,7 @@ if option_accuracy == calculator_type:
             result = accuracy_sample_size(benchmark_success_rate=benchmark, accuracy_goal=accuracy_goal)
 
             f"""### Result   
-An minimum **Audit Size** of {result['sample_size']} is required to measure a **Success Rate** of {benchmark_percent}% within {result['accuracy'] * 100.:0.1f}% **Accuracy**."""
+An minimum **Audit Size** of {result['sample_size']} is required to measure a **Success Rate** of {benchmark_percent}% within {result['accuracy'] * 100.:0.1f}% **Accuracy** (95% CI)."""
 
             success = result['sample_size'] * benchmark
             failure = result['sample_size'] - success
@@ -117,7 +119,6 @@ elif option_clearance == calculator_type:
         'Risk Factor: Max False Positive Rate in (%)', value=1., min_value=0.01,
         max_value=5.)
     mfpr_rate = mfpr_percent / 100.
-
 
 
     if stage_interpreting == audit_stage:
