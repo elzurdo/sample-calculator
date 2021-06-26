@@ -32,29 +32,53 @@ else:
 
     """
     # Audit Calculators
-    **Assessing what we can learn from a small(ish) sample.**
+    **Calculate a model's performance based on audit data.**
     
+    Use these calculators to:  
     * 🔬 Interpret audit results  
-    * 💰 Plan an audit budget- Explore trade-off decisions when determining the audit size.
+    * 💰 Plan an audit budget- determine an audit size, by exploring trade-offs.
     
-    When interpreting audit results these calculators can answer these questions: 
-    * *"How well does the model **perform**"?*.
-    * *"Does ths model perform **better than value X**?"*. 
-    * *"Is the current model **performing better than a previous**?"* - model comparisons.
-    
-    We find that understanding how to draw conclusions from the data 🔬, assists budgeting for the required 
+   We find that understanding how to draw conclusions from a sample 🔬, assists budgeting for the required 
     sample size 💰.
     
+    When interpreting audit results 🔬 these calculators can assess the answers the following: 
+    * *"How well does the model **perform**"?*.
+    * *"Does the model perform **better than value X**?"*. 
+    * *"Is the model **performing better than a previous**?"* - model comparison.
+    
+    """
+
+
+    text_difference = """
+    The questions above are ranked by their level of complexity in answering.
+    The reason for this is that the more moving pieces there are to a calculation the more complex it is to answer.
+    
+    * **Model performance**  - the most simple as it involves only 2 values: sample size and success rate.
+    * **Better than *X*** - involves an additional value *X*. 
+    * **Model comparison** - assuming each model has its own sample, this requires: two sample sizes and two success rates.
+    
+   
+    """
+
+    with st.beta_expander('What is the difference?'):
+        st.write(text_difference)
+
+    """
+    ## Let's Go!
     To start, simply select on the left hand panel ⬅️  what you are interesting in calculating: 
     
     * Audit interpretation 🔬 or budgeting 💰?
-    * Which model question to answer: performance, better than value X, or model comparison.
+    
+    After which you will be able to a select model question to answer:  
+    * **Performance** or **better than value X**?
     
     🚧🚧🚧 
-    Apologies, but the model comparison option is not available yet.
+    Apologies, but the **model comparison** option is not available yet.
     🚧🚧🚧 
-    
     """
+    
+
+
 
     text_learn_more = """
     There are two good rules of thumb when relating audit results to the model:
