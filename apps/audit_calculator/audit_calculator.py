@@ -8,20 +8,67 @@ from utils_viz import plot_success_rates_methods, \
 from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY
 import utils_text
 
-stage_planning = "Plan an Audit Budget"
-stage_interpreting = "Interpret Audit Results"
 
-audit_stage =  st.sidebar.selectbox('I am looking to', [stage_planning, stage_interpreting], index=1)
+stage_landing = "learn about these calculators"
+stage_planning = "plan an audit budget"
+stage_interpreting = "interpret audit results"
+
+audit_stage =  st.sidebar.selectbox('I am looking to', [stage_landing, stage_planning, stage_interpreting], index=2)
 
 option_accuracy = "for Accuracy"
 option_clearance = "for Passing a Success Rate"
 
-if stage_planning == audit_stage:
-    calculator_types = [option_accuracy]
-elif stage_interpreting == audit_stage:
-    calculator_types = [option_clearance]
 
-calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=0)
+if stage_landing != audit_stage:
+
+    if stage_planning == audit_stage:
+        calculator_types = [option_accuracy]
+    elif stage_interpreting == audit_stage:
+        calculator_types = [option_clearance]
+
+    calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=0)
+else:
+    calculator_type = None
+
+    """
+    # Audit Calculators
+    **Assessing what we can learn from a small(ish) sample.**
+    
+    * 🔬 Interpret audit results  
+    * 💰 Plan an audit budget- Explore trade-off decisions when determining the audit size.
+    
+    When interpreting audit results these calculators can answer these questions: 
+    * *"How well does the model **perform**"?*.
+    * *"Does ths model perform **better than value X**?"*. 
+    * *"Is the current model **performing better than a previous**?"* - model comparisons.
+    
+    We find that understanding how to draw conclusions from the data 🔬, assists budgeting for the required 
+    sample size 💰.
+    
+    To start, simply select on the left hand panel ⬅️  what you are interesting in calculating: 
+    
+    * Audit interpretation 🔬 or budgeting 💰?
+    * Which model question to answer: performance, better than value X, or model comparison.
+    
+    🚧🚧🚧 
+    Apologies, but the model comparison option is not available yet.
+    🚧🚧🚧 
+    
+    """
+
+    text_learn_more = """
+    There are two good rules of thumb when relating audit results to the model:
+    * The audit result is a **proxy** for that of the model. Not equal.
+    * 📐 Accuracy is **expensive**. The finer the measurement, the more it's going to cost (larger sample size). 
+    
+    Main assumption/limitation:  
+    These calculators assume coin flip statistics, known as Binomial Trials (or Bernoulli Trials). 
+    In other words - a model that generate binary data, e.g, *success* and *failure* (or *True* and *False*; *Heads* or *Tails*).
+    
+    """
+
+    with st.beta_expander('Learn More'):
+        st.write(text_learn_more)
 
 
 if option_accuracy == calculator_type:
