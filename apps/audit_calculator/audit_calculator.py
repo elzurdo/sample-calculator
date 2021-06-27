@@ -174,7 +174,7 @@ An minimum **Audit Size** of {result['sample_size']} is required to measure a **
 
 elif option_clearance == calculator_type:
 
-    success_rate_boundary_percent = st.sidebar.number_input('Model Min Success Rate (%)',
+    success_rate_boundary_percent = st.sidebar.number_input('Model min Success Rate (%)',
                                                             value=93.0, min_value=90.,
                                                             max_value=99.)
 
@@ -192,14 +192,15 @@ elif option_clearance == calculator_type:
                                               max_value=10000)
 
     mfpr_percent = st.sidebar.number_input(
-        'Risk Factor: Max False Positive Rate in (%)', value=1., min_value=0.01,
+        'Risk Factor: max False Positive Rate (%)', value=1., min_value=0.01,
         max_value=5.)
     mfpr_rate = mfpr_percent / 100.
 
+    st.sidebar.write(
+        utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate))
+
     if stage_interpreting == audit_stage:
         st.write(utils_text.interpret_pass_header(success_rate_boundary))
-        st.sidebar.write(utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate))
-
         observation_result = observed_success_correctness(observed_success_rate, sample_size, generator_success_rates=None,
                                          success_rate_boundary=success_rate_boundary,
                                          tpr_method="flat_min", min_ab=0.5)

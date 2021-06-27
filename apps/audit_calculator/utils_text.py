@@ -18,10 +18,10 @@ def interpret_pass_header(success_rate_boundary):
     return text
 
 def risk_factor_explanation(success_rate_boundary, mfpr_rate):
-    text = f"""### Explanation
+    text = f"""### Risk Factor Explanation
 *A model passes >{success_rate_boundary * 100.:0.1f}% safety if the **Audit FPR**{less_equal}{mfpr_rate * 100:0.2f}%.*   
 
-*This guarantees, e.g, that for every 1,000 similar audits, we consider a maximum of
+*This guarantees, e.g, that for every 1,000 similar audit results, we consider a maximum of
 {mfpr_rate * 1000.:0.0f} **incorrect** "model pass decisions" to be acceptable. (I.e,  models that are actually {less_equal}{success_rate_boundary * 100.:0.1f}% safe)*
 """
 
