@@ -1,10 +1,52 @@
 
 less_equal = r"""$$\le$$"""
 
+def landing_header():
+    text = \
+    """
+    # Audit Calculators 🧮
+    **Calculate a model's performance based on audit data.**
+
+    Use these calculators to:  
+    * 🔬 Interpret audit results  
+    * 💰 Plan an audit budget- determine an audit size, by exploring trade-offs.
+
+   We find that understanding how to draw conclusions from a sample 🔬, assists budgeting for the required 
+    sample size 💰.
+
+    When interpreting audit results 🔬 these calculators can assess the answers the following: 
+    * 📐 Determining Accuracy: *"How well does the model perform"?* 
+    * ⛑ Ensuring Value Clearance: *"Does the model perform better than value X?"* 
+    * ⚖️ Model Comparison: *"Is the model performing better than a previous?"*
+    """
+
+    return text
+
+def landing_instructions():
+    text = \
+    """
+    ## Let's Go!
+    To start, simply select on the left hand panel ⬅️  what you are interesting in calculating:
+
+    * Audit **Interpretation** 🔬 or **Budgeting** 💰?
+
+    After which you will be able to a select model question to answer:
+    * **Determine Accuracy** 📐 or **Value Clearance** ⛑?
+
+    🚧
+    Apologies, but the **Model Comparison** option ⚖️ is not available yet.
+    🚧
+    """
+
+    return text
+
+
+
+
 def interpret_pass_header(success_rate_boundary):
     text = \
     f"""
-    # Audit Result Interpreter 🧮 
+    # Audit Clearance Interpreter ⛑🔬️ 
     **Got data? Use this calculator to draw conclusions.**
 
     This **Interpreter** calculator addresses the question:   
@@ -13,6 +55,44 @@ def interpret_pass_header(success_rate_boundary):
 
     ### Instructions  
     ⬅️ Please provide on the left hand panel the **Audit Size**, **Audit Safety Rate** and **Risk Factor** to find out if the model that generated this sample result may be considered >{success_rate_boundary * 100.:0.1f}% safe.
+    """
+
+    return text
+
+def plan_accuracy_header():
+    text = \
+    f"""
+    # Audit Accuracy Planner 📐💰
+
+    **Plan an audit budget based on the desired accuracy.**   
+
+    This calculator addresses the question:  
+    “What is the minimum **Audit Size** necessary to determine a **Success Rate** value?“ 
+
+    Two values are required to determine the **Audit Size**:
+    * **Goal Accuracy** - The more accurate the result, the larger the sample size required. 
+    * **Baseline Success Rate** - The expected metric value. The closer this expected value is to 50% the larger the sample size required.
+    """
+
+    return text
+
+
+def plan_clearance_header(success_rate_boundary):
+    text = \
+    f"""
+    # Audit Clearance Planner ⛑️💰
+
+    **Plan an audit budget to ensure that the model success rate is better than {success_rate_boundary * 100:0.1f}%.**   
+
+    This **Planning** calculator addresses the question:   
+    “What **Audit Size**  should be budgeted for an expected **Audit Safety Rate**, to ensure that the generating model to be >{success_rate_boundary * 100.:0.1f}% successful?”
+
+    Two values are required to determine the **Audit Size**:
+    * **Risk Factor** - The maximum  **False Positive Rate** deemed acceptable. 
+    * **Audit Success Rate** - The min audit success rate to ensure **Audit FPR** < **Risk Factor**. 
+
+    ### Instructions  
+    ⬅️ On the left hand panel provide the **Risk Factor** expected and the **Audit Success Rate** to find out the minimum **Audit Size**.
     """
 
     return text

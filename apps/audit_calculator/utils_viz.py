@@ -67,7 +67,7 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
         plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
 
     plt.legend(title=legend_title)
-    plt.title(f"Audit success rate {audit_success_rate * 100:0.1f}%, Audit Size={audit_size:,}")
+    plt.title(f"Audit: Success Rate {audit_success_rate * 100:0.1f}%, Size={int(audit_size):,}")
 
     ax = plt.gca()
     #grid

@@ -8,16 +8,18 @@ from utils_viz import plot_success_rates_methods, \
 from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY, sample_rate_fpr_to_size
 import utils_text
 
+image_differences = "https://user-images.githubusercontent.com/6064016/123537964-3bfd8200-d72a-11eb-8431-47ac1530b193.png"
 
-
-stage_landing = "learn about these calculators"
+stage_landing = "learn about these calculators."
 stage_planning = "plan an audit budget"
 stage_interpreting = "interpret audit results"
 
-audit_stage =  st.sidebar.selectbox('I would like to ...', [stage_landing, stage_planning, stage_interpreting], index=2)
 
-option_accuracy = "Performance - measuring metric accuracy"
-option_clearance = "Better than X"
+st.sidebar.write("""## Select a Calculator""")
+audit_stage =  st.sidebar.selectbox('I would like to ...', [stage_landing, stage_planning, stage_interpreting], index=0)
+
+option_accuracy = "determine accuracy."
+option_clearance = "ensure value clearance."
 
 if stage_landing != audit_stage:
     if stage_planning == audit_stage:
@@ -27,62 +29,31 @@ if stage_landing != audit_stage:
         calculator_types = [option_clearance]
         calc_index = 0
 
-    calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=calc_index)
+    calculator_type = st.sidebar.selectbox('in order to ...', calculator_types, index=calc_index)
+
+    st.sidebar.write("""---""")
+
+    st.sidebar.write("""## Calculator Parameters""")
 else:
     calculator_type = None
+    st.write(utils_text.landing_header())
 
-    """
-    # Audit Calculators
-    **Calculate a model's performance based on audit data.**
-    
-    Use these calculators to:  
-    * 🔬 Interpret audit results  
-    * 💰 Plan an audit budget- determine an audit size, by exploring trade-offs.
-    
-   We find that understanding how to draw conclusions from a sample 🔬, assists budgeting for the required 
-    sample size 💰.
-    
-    When interpreting audit results 🔬 these calculators can assess the answers the following: 
-    * *"How well does the model **perform**"?*.
-    * *"Does the model perform **better than value X**?"*. 
-    * *"Is the model **performing better than a previous**?"* - model comparison.
-    
-    """
-
-    image_differences = "https://user-images.githubusercontent.com/6064016/123532974-bd90e800-d709-11eb-8026-0bc2cf1c852c.png"
-    st.image(image_differences, caption="Visualising the three types of calculators.  The bell shapes represent the model probability given audit data (known as the posterior).")
+    st.image(image_differences, caption="Visualising the three types of calculators.  The bell shapes represent the model probability given audit data (known as the posterior distribution).")
 
 
     text_difference = """
     The questions above are have different levels of of complexity.  
     The reason for this is that the more moving pieces there are to a calculation the more complex it is to answer.
     
-    * **Model performance**  - the most simple involving only 2 values: sample size and success rate.
-    * **Better than *X*** - involves an additional value *X*. 
-    * **Model comparison** - each model has its own sample, i.e: 2 sample sizes and 2 success rates.
-    
-   
+    * **Determining Accuracy**  - the most simple involving only 2 values: sample size and success rate.
+    * **Ensuring Value Clearance** - sample size, success rate said the value. 
+    * **Model Comparison** - each model has its own sample, i.e: 2 sample sizes and 2 success rates.
     """
 
     with st.beta_expander('Why three separate calculations?'):
         st.write(text_difference)
 
-    """
-    ## Let's Go!
-    To start, simply select on the left hand panel ⬅️  what you are interesting in calculating: 
-    
-    * Audit interpretation 🔬 or budgeting 💰?
-    
-    After which you will be able to a select model question to answer:  
-    * **Performance** or **better than value X**?
-    
-    🚧🚧🚧 
-    Apologies, but the **model comparison** option is not available yet.
-    🚧🚧🚧 
-    """
-    
-
-
+    st.write(utils_text.landing_instructions())
 
     text_learn_more = """
     There are two good rules of thumb when relating audit results to the model:
@@ -99,21 +70,14 @@ else:
         st.write(text_learn_more)
 
 
+
+
+
+
+
 if option_accuracy == calculator_type:
     if stage_planning == audit_stage:
-
-        f"""
-        # Audit Accuracy Planner 📐💰 
-    
-        **Plan your budget based on the desired accuracy.**   
-        
-        This calculator addresses the question:  
-        “What is the minimum **Audit Size** necessary to determine a **Success Rate** value?“ 
-    
-        Two values are required to determine the **Audit Size**:
-        * **Goal Accuracy** - The more accurate the result, the larger the sample size required. 
-        * **Baseline Success Rate** - The expected metric value. The closer this expected value is to 50% the larger the sample size required.
-        """
+        st.write(utils_text.plan_accuracy_header())
 
         planning_plug = "Explore one scenario plug in"
         planning_all = "View all scenarios (takes about 10 seconds)"
@@ -181,8 +145,15 @@ elif option_clearance == calculator_type:
     success_rate_boundary = success_rate_boundary_percent / 100.
 
     ci_fraction = 0.95
+    min_observed_success_percent = 0.01
+
+    if stage_planning == audit_stage:
+        min_observed_success_percent = success_rate_boundary_percent + 0.01
+
+
+
     observed_success_percent = st.sidebar.number_input('Audit Success Rate (%)',
-                                                       value=98., min_value=0.01,
+                                                       value=98., min_value=min_observed_success_percent,
                                                        max_value=99.)
 
     observed_success_rate = observed_success_percent / 100.
@@ -237,30 +208,45 @@ elif option_clearance == calculator_type:
 
         interpretation_boundary_success_text
 
-        show_visual = st.checkbox('Show visualisation', value=True)
+    elif stage_planning == audit_stage:
+        st.write(utils_text.plan_clearance_header(success_rate_boundary))
 
+        max_sample_size = 1000
+
+        sample_size = sample_rate_fpr_to_size(observed_success_rate, mfpr_rate, success_rate_boundary=success_rate_boundary, max_sample_size=max_sample_size)
+
+        this_text = \
+            f"""### Results 
+To ensure a model success rate is larger than {success_rate_boundary_percent}% with a **Risk Factor** of {mfpr_percent}% under the condition that 
+the observable **Audit Success Rate** is at least {observed_success_percent}% requires"""
+
+        if sample_size is not None:
+            this_text += f""" a sample of size: 
+## {int(sample_size):,} samples
+"""
+
+        else:
+            this_text += f""" a sample with more than {max_sample_size:,} samples. 
+
+Please adjust either the **Risk Factor** or the **Audit Success Rate.**"""
+            sample_size = max_sample_size
+
+        this_text
+
+    show_visual = st.checkbox('Show visualisation', value=True)
+
+    if show_visual:
         viz_text = """
         ---  
-        Visualisation options
+        ## Visualisation options
         """
+        st.sidebar.write(viz_text)
+        ac_display = st.sidebar.checkbox('Agresti-Coull 95% CI', value=False)
+        display_ci = st.sidebar.checkbox('High Density 95% Credible Interval', value=False)
 
-        if show_visual:
-            st.sidebar.write(viz_text)
-            ac_display = st.sidebar.checkbox('Agresti-Coull 95% CI', value=False)
-            display_ci = st.sidebar.checkbox('High Density 95% Credible Interval', value=False)
-
-            plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=success_rate_boundary)
-            plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci)
-            st.pyplot(plt.gcf())
-
-    elif stage_planning == audit_stage:
-
-        audit_size = sample_rate_fpr_to_size(observed_success_rate, mfpr_rate, success_rate_boundary=success_rate_boundary)
-
-        f"""To ensure a model success rate is larger than {success_rate_boundary_percent}% with a **Risk Factor** of {mfpr_percent}% under the condition that 
-the observable **Audit Success Rate** is at least {observed_success_percent}% requires a sample of size: 
-## {int(audit_size):,}
-"""
+        plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=success_rate_boundary)
+        plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci)
+        st.pyplot(plt.gcf())
 
 
     text_expanded_mfpr = f"""
