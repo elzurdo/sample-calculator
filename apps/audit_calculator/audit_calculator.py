@@ -5,27 +5,30 @@ from utils_viz import plot_success_rates_methods, \
     plot_boundary_true_false_positive_rates,  \
     plot_metric_accuracy, plot_success_rates
 
-from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY
+from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY, sample_rate_fpr_to_size
 import utils_text
 
+# audit_size = sample_rate_fpr_to_size(0.96, 0.01)
+# audit_size
 
 stage_landing = "learn about these calculators"
 stage_planning = "plan an audit budget"
 stage_interpreting = "interpret audit results"
 
-audit_stage =  st.sidebar.selectbox('I am looking to', [stage_landing, stage_planning, stage_interpreting], index=2)
+audit_stage =  st.sidebar.selectbox('I would like to ...', [stage_landing, stage_planning, stage_interpreting], index=2)
 
-option_accuracy = "for Accuracy"
-option_clearance = "for Passing a Success Rate"
+option_accuracy = "Performance - measuring metric accuracy"
+option_clearance = "Better than X"
 
 if stage_landing != audit_stage:
-
     if stage_planning == audit_stage:
-        calculator_types = [option_accuracy]
+        calculator_types = [option_accuracy, option_clearance]
+        calc_index = 1
     elif stage_interpreting == audit_stage:
         calculator_types = [option_clearance]
+        calc_index = 0
 
-    calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=0)
+    calculator_type = st.sidebar.selectbox('Calculator Type', calculator_types, index=calc_index)
 else:
     calculator_type = None
 

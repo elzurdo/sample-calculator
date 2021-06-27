@@ -223,3 +223,27 @@ def accuracy_sample_size(benchmark_success_rate = 0.8, accuracy_goal = 0.10, d_s
         return {"sample_size": sample_size, "accuracy": this_precision}
     else:
         return None
+
+
+def sample_rate_fpr_to_size(success_rate, max_fpr, success_rate_boundary=SUCCESS_RATE_BOUNDARY, max_sample_size=1000, d_sample = 200, tpr_method="flat_min", min_ab=0.5, generator_success_rates=None):
+    assert success_rate < 1.  # does not work for perfect success rate
+    assert success_rate > success_rate_boundary  # success rate needs to be higher than boundary
+
+
+    min_sample_size = np.round(1. / (1. - success_rate)) # min for required to examine on failure
+
+    sample_sizes = np.arange(min_sample_size, max_sample_size + d_sample, d_sample)
+
+    for sample_size in sample_sizes:
+        #success = success_rate * sample_size
+        #failure = sample_size - success
+
+        results = observed_success_correctness(success_rate, sample_size,
+                                     generator_success_rates=generator_success_rates,
+                                     success_rate_boundary=success_rate_boundary,
+                                     tpr_method=tpr_method, min_ab=min_ab)
+
+
+        if results["false_rate"] < max_fpr:
+            return sample_size
+
