@@ -18,7 +18,6 @@ audit_stage =  st.sidebar.selectbox('I am looking to', [stage_landing, stage_pla
 option_accuracy = "for Accuracy"
 option_clearance = "for Passing a Success Rate"
 
-
 if stage_landing != audit_stage:
 
     if stage_planning == audit_stage:
@@ -48,19 +47,22 @@ else:
     
     """
 
+    image_differences = "https://user-images.githubusercontent.com/6064016/123532974-bd90e800-d709-11eb-8026-0bc2cf1c852c.png"
+    st.image(image_differences, caption="Visualising the three types of calculators.  The bell shapes represent the model probability given audit data (known as the posterior).")
+
 
     text_difference = """
-    The questions above are ranked by their level of complexity in answering.
+    The questions above are have different levels of of complexity.  
     The reason for this is that the more moving pieces there are to a calculation the more complex it is to answer.
     
-    * **Model performance**  - the most simple as it involves only 2 values: sample size and success rate.
+    * **Model performance**  - the most simple involving only 2 values: sample size and success rate.
     * **Better than *X*** - involves an additional value *X*. 
-    * **Model comparison** - assuming each model has its own sample, this requires: two sample sizes and two success rates.
+    * **Model comparison** - each model has its own sample, i.e: 2 sample sizes and 2 success rates.
     
    
     """
 
-    with st.beta_expander('What is the difference?'):
+    with st.beta_expander('Why three separate calculations?'):
         st.write(text_difference)
 
     """
