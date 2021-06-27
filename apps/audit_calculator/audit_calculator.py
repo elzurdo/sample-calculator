@@ -8,8 +8,7 @@ from utils_viz import plot_success_rates_methods, \
 from utils_stats import accuracy_sample_size, observed_success_correctness, SUCCESS_RATE_BOUNDARY, sample_rate_fpr_to_size
 import utils_text
 
-# audit_size = sample_rate_fpr_to_size(0.96, 0.01)
-# audit_size
+
 
 stage_landing = "learn about these calculators"
 stage_planning = "plan an audit budget"
@@ -188,20 +187,18 @@ elif option_clearance == calculator_type:
 
     observed_success_rate = observed_success_percent / 100.
 
-    sample_size = st.sidebar.number_input('Audit Size', value=100, min_value=100,
-                                          max_value=10000)
+    if audit_stage in [stage_interpreting]:
+        sample_size = st.sidebar.number_input('Audit Size', value=100, min_value=100,
+                                              max_value=10000)
 
     mfpr_percent = st.sidebar.number_input(
         'Risk Factor: Max False Positive Rate in (%)', value=1., min_value=0.01,
         max_value=5.)
     mfpr_rate = mfpr_percent / 100.
 
-
     if stage_interpreting == audit_stage:
         st.write(utils_text.interpret_pass_header(success_rate_boundary))
         st.sidebar.write(utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate))
-
-
 
         observation_result = observed_success_correctness(observed_success_rate, sample_size, generator_success_rates=None,
                                          success_rate_boundary=success_rate_boundary,
@@ -257,7 +254,12 @@ elif option_clearance == calculator_type:
 
     elif stage_planning == audit_stage:
 
-        """TBD"""
+        audit_size = sample_rate_fpr_to_size(observed_success_rate, mfpr_rate, success_rate_boundary=success_rate_boundary)
+
+        f"""To ensure a model success rate is larger than {success_rate_boundary_percent}% with a **Risk Factor** of {mfpr_percent}% under the condition that 
+the observable **Audit Success Rate** is at least {observed_success_percent}% requires a sample of size: 
+## {int(audit_size):,}
+"""
 
 
     text_expanded_mfpr = f"""
@@ -271,7 +273,7 @@ elif option_clearance == calculator_type:
     """
 
 
-    with st.beta_expander("""Risk mitigation by Max FPR"""):
+    with st.beta_expander("""Importance of the Risk Factor"""):
         st.write(text_expanded_mfpr)
 
 
