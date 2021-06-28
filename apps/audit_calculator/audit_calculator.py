@@ -33,6 +33,9 @@ if stage_landing != audit_stage:
 
     st.sidebar.write("""---""")
 
+    metric_name = st.sidebar.text_input('Parameter name', value='success').lower()
+    metric_name_title = metric_name.title()
+
     st.sidebar.write("""## Calculator Parameters""")
 else:
     calculator_type = None
@@ -42,11 +45,10 @@ else:
 
 
     text_difference = """
-    The questions above are have different levels of of complexity.  
-    The reason for this is that the more moving pieces there are to a calculation the more complex it is to answer.
+    The questions above have different levels of difficulty, because the more moving pieces there are to a calculation the more complex it is to answer.
     
-    * **Determining Accuracy**  - the most simple involving only 2 values: sample size and success rate.
-    * **Ensuring Value Clearance** - sample size, success rate said the value. 
+    * **Determining Accuracy**  - the most simple involving only: sample size and success rate.
+    * **Ensuring Value Clearance** - sample size, success rate the said value. 
     * **Model Comparison** - each model has its own sample, i.e: 2 sample sizes and 2 success rates.
     """
 
@@ -72,12 +74,9 @@ else:
 
 
 
-
-
-
 if option_accuracy == calculator_type:
     if stage_planning == audit_stage:
-        st.write(utils_text.plan_accuracy_header())
+        st.write(utils_text.plan_accuracy_header(metric_name=metric_name))
 
         planning_plug = "Explore one scenario plug in"
         planning_all = "View all scenarios (takes about 10 seconds)"
@@ -89,12 +88,12 @@ if option_accuracy == calculator_type:
 
         elif planning_plug == explore_mode:
 
-            """    
+            f"""    
             ### Instructions  
-    ⬅️ On the left hand panel provide the **Baseline Success Rate** expected and **Goal Accuracy** to find out the minimum **Audit Size**.
+    ⬅️ On the left hand panel provide the **Baseline {metric_name_title} Rate** expected and **Goal Accuracy** to find out the minimum **Audit Size**.
     """
 
-            benchmark_percent = st.sidebar.number_input('Baseline Success Rate (%)', value=80.,
+            benchmark_percent = st.sidebar.number_input(f'Baseline {metric_name_title} Rate (%)', value=80.,
                                                     min_value=50.,
                                                     max_value=99.)
             benchmark = benchmark_percent/100.
@@ -106,7 +105,7 @@ if option_accuracy == calculator_type:
             result = accuracy_sample_size(benchmark_success_rate=benchmark, accuracy_goal=accuracy_goal)
 
             f"""### Result   
-An minimum **Audit Size** of {result['sample_size']} is required to measure a **Success Rate** of {benchmark_percent}% within {result['accuracy'] * 100.:0.1f}% **Accuracy** (95% CI)."""
+An minimum **Audit Size** of {result['sample_size']} is required to measure a **{metric_name_title} Rate** of {benchmark_percent}% within {result['accuracy'] * 100.:0.1f}% **Accuracy** (95% CI)."""
 
             success = result['sample_size'] * benchmark
             failure = result['sample_size'] - success
@@ -115,7 +114,7 @@ An minimum **Audit Size** of {result['sample_size']} is required to measure a **
                                color="purple", format='-', label=None, fill=False,
                                display_ci=True,
                                alpha=1., factor=1., ci_label=None,
-                               xlabel="success rate",
+                               xlabel=f"{metric_name} rate",
                                ylabel="probability distribution function")
 
             st.pyplot(plt.gcf())
@@ -125,7 +124,7 @@ An minimum **Audit Size** of {result['sample_size']} is required to measure a **
 
         str_explanation = f"""
         * **Accuracy** - The 95% Credible Interval using the High Density Interval method.
-        * **Success Rate** - This assumes metrics that are binary in nature (only has value "success", "failure") and follow a Bernoulli distribution.
+        * **{metric_name_title} Rate** - This assumes metrics that are binary in nature (only has value "success", "failure") and follow a Bernoulli distribution.
         """
 
         with st.beta_expander('Definitions'):
@@ -138,7 +137,7 @@ An minimum **Audit Size** of {result['sample_size']} is required to measure a **
 
 elif option_clearance == calculator_type:
 
-    success_rate_boundary_percent = st.sidebar.number_input('Model min Success Rate (%)',
+    success_rate_boundary_percent = st.sidebar.number_input(f'Model min {metric_name.title()} Rate (%)',
                                                             value=93.0, min_value=90.,
                                                             max_value=99.)
 
@@ -152,7 +151,7 @@ elif option_clearance == calculator_type:
 
 
 
-    observed_success_percent = st.sidebar.number_input('Audit Success Rate (%)',
+    observed_success_percent = st.sidebar.number_input(f'Audit {metric_name.title()} Rate (%)',
                                                        value=98., min_value=min_observed_success_percent,
                                                        max_value=99.)
 
@@ -168,10 +167,10 @@ elif option_clearance == calculator_type:
     mfpr_rate = mfpr_percent / 100.
 
     st.sidebar.write(
-        utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate))
+        utils_text.risk_factor_explanation(success_rate_boundary, mfpr_rate, metric_name=metric_name))
 
     if stage_interpreting == audit_stage:
-        st.write(utils_text.interpret_pass_header(success_rate_boundary))
+        st.write(utils_text.interpret_pass_header(success_rate_boundary, metric_name=metric_name))
         observation_result = observed_success_correctness(observed_success_rate, sample_size, generator_success_rates=None,
                                          success_rate_boundary=success_rate_boundary,
                                          tpr_method="flat_min", min_ab=0.5)
@@ -186,17 +185,17 @@ elif option_clearance == calculator_type:
 
             if mfpr_success_bool:
                 # with a FPR smaller than the maximum
-                audit_result_str = utils_text.risk_success(success_rate_boundary, observation_result, mfpr_rate)
+                audit_result_str = utils_text.risk_success(success_rate_boundary, observation_result, mfpr_rate, metric_name=metric_name)
             else:
                 # with a FPR smaller than the maximum
 
-                audit_result_str = utils_text.risk_fail(success_rate_boundary, observation_result, mfpr_rate)
+                audit_result_str = utils_text.risk_fail(success_rate_boundary, observation_result, mfpr_rate, metric_name=metric_name)
         else:
             str_over_under = """**equal or under**"""
             observed_fpr = observation_result['true_rate']
-            audit_result_str = utils_text.thresh_fail(success_rate_boundary, observed_success_rate)
+            audit_result_str = utils_text.thresh_fail(success_rate_boundary, observed_success_rate, metric_name=metric_name)
 
-        text_result = utils_text.results(success_rate_boundary, sample_size, observed_success_rate, observed_fpr, str_over_under)
+        text_result = utils_text.results(success_rate_boundary, sample_size, observed_success_rate, observed_fpr, str_over_under, metric_name=metric_name)
 
 
         interpretation_boundary_success_text = \
@@ -209,7 +208,7 @@ elif option_clearance == calculator_type:
         interpretation_boundary_success_text
 
     elif stage_planning == audit_stage:
-        st.write(utils_text.plan_clearance_header(success_rate_boundary))
+        st.write(utils_text.plan_clearance_header(success_rate_boundary, metric_name=metric_name))
 
         max_sample_size = 1000
 
@@ -217,8 +216,8 @@ elif option_clearance == calculator_type:
 
         this_text = \
             f"""### Results 
-To ensure a model success rate is larger than {success_rate_boundary_percent}% with a **Risk Factor** of {mfpr_percent}% under the condition that 
-the observable **Audit Success Rate** is at least {observed_success_percent}% requires"""
+To ensure a model {metric_name} rate is larger than {success_rate_boundary_percent}% with a **Risk Factor** of {mfpr_percent}% under the condition that 
+the observable **Audit {metric_name_title} Rate** is at least {observed_success_percent}% requires"""
 
         if sample_size is not None:
             this_text += f""" a sample of size: 
@@ -228,7 +227,7 @@ the observable **Audit Success Rate** is at least {observed_success_percent}% re
         else:
             this_text += f""" a sample with more than {max_sample_size:,} samples. 
 
-Please adjust either the **Risk Factor** or the **Audit Success Rate.**"""
+Please adjust either the **Risk Factor** or the **Audit {metric_name_title} Rate.**"""
             sample_size = max_sample_size
 
         this_text
@@ -245,15 +244,15 @@ Please adjust either the **Risk Factor** or the **Audit Success Rate.**"""
         display_ci = st.sidebar.checkbox('High Density 95% Credible Interval', value=False)
 
         plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=success_rate_boundary)
-        plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci)
+        plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci, metric_name=metric_name)
         st.pyplot(plt.gcf())
 
 
     text_expanded_mfpr = f"""
     By committing to a **Max False Positive Rate (Max FPR)** of 
-    {mfpr_percent}%, results with with a higher **Audit FPR** will not be considered >{success_rate_boundary*100.:0.1f}% safe and hence fail. 
+    {mfpr_percent}%, results with with a higher **Audit FPR** will not be considered >{success_rate_boundary*100.:0.1f}% {metric_name} and hence fail. 
     
-    This ensures that that we mitigate the risk at accepting models with relatively lower safety rates than {success_rate_boundary*100.:0.1f}%.
+    This ensures that that we mitigate the risk at accepting models with relatively lower {metric_name} rates than {success_rate_boundary*100.:0.1f}%.
     
     E.g, this commitment guarantees that for every 1,000 audits, we should expect and average of 
     {mfpr_rate * 1000.:0.1f} to be False Positives.

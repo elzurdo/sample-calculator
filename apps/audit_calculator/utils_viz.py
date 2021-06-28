@@ -49,17 +49,15 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
         plt.ylabel(ylabel)
 
 
-def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True):
+def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True, metric_name="success"):
     ci_type_str = "High Density"
     if "ET" == ci_type_str:
         ci_type_str = "Jeffreys"
 
-
-
     plot_success_rates(audit_success_rate * audit_size,
                      (1 - audit_success_rate) * audit_size,
                      ci_fraction=ci_fraction, ci_label=f"{ci_type_str} {ci_fraction * 100.:0.1f}% CI", label="Posterior", ci_type=ci_type,
-                       xlabel="model success rate", display_ci=display_ci)
+                       xlabel=f"model {metric_name} rate", display_ci=display_ci)
 
     # Agresti-Coull
     if ac_display:
@@ -67,7 +65,7 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
         plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
 
     plt.legend(title=legend_title)
-    plt.title(f"Audit: Success Rate {audit_success_rate * 100:0.1f}%, Size={int(audit_size):,}")
+    plt.title(f"Audit: Size={int(audit_size):,}, {metric_name.title()} Rate {audit_success_rate * 100:0.1f}%")
 
     ax = plt.gca()
     #grid
