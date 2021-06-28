@@ -158,7 +158,7 @@ elif option_clearance == calculator_type:
     observed_success_rate = observed_success_percent / 100.
 
     if audit_stage in [stage_interpreting]:
-        sample_size = st.sidebar.number_input('Audit Size', value=100, min_value=100,
+        sample_size = st.sidebar.number_input('Audit Size', value=100, min_value=50,
                                               max_value=10000)
 
     mfpr_percent = st.sidebar.number_input(
