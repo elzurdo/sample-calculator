@@ -24,7 +24,7 @@ option_clearance = "⛑ ensure value clearance."
 if stage_landing != audit_stage:
     if stage_planning == audit_stage:
         calculator_types = [option_accuracy, option_clearance]
-        calc_index = 1
+        calc_index = 0
     elif stage_interpreting == audit_stage:
         calculator_types = [option_accuracy, option_clearance]
         calc_index = 0
