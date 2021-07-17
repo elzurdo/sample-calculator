@@ -176,12 +176,20 @@ def multiple_observed_successes_correctness(sample_size, all_observed_success_ra
     return success_correctness
 
 
-def hdi_ci_full_width(p, n, ci_fraction=0.95):
+def hdi_ci_full_width(p, n, ci_fraction=CI_FRACTION):
     a = p * n
     b = n - a
 
     ci_min, ci_max = HDIofICDF(beta, a=a, b=b, ci_fraction=ci_fraction)
     return ci_max - ci_min
+
+
+def hdi_ci_limits(p, n, ci_fraction=CI_FRACTION):
+    a = p * n
+    b = n - a
+
+    ci_min, ci_max = HDIofICDF(beta, a=a, b=b, ci_fraction=ci_fraction)
+    return ci_min, ci_max
 
 
 def sample_size_success_precision(d_sample_size = 10, min_size = 20, max_size = 1000, d_success = 0.05, min_success = 0.5, max_success = 1.):

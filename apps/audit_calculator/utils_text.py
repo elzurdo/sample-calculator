@@ -54,7 +54,24 @@ def interpret_pass_header(success_rate_boundary, metric_name="success"):
 
 
     ### Instructions  
-    ⬅️ Please provide on the left hand panel the **Audit Size**, **Audit {metric_name.title()} Rate** and **Risk Factor**.
+    ⬅️ Please provide on the left hand panel the **Audit {metric_name.title()} Rate**, **Audit Size** and **Risk Factor**.
+    """
+
+    return text
+
+
+def interpret_accuracy_header(ci_fraction, metric_name="success"):
+    text = \
+    f"""
+    # Audit Accuracy Interpreter 📐🔬️ 
+    **Got data? Use this calculator to assess the  {ci_fraction * 100.:0.1f}% Credible Interval of {metric_name}.**
+
+    This **Interpreter** calculator addresses the question:   
+    “Given an **Audit Size** with an **Audit {metric_name.title()} Rate**, what is the model {metric_name} rate within a {ci_fraction * 100.:0.1f}% credible interval?”
+
+
+    ### Instructions  
+    ⬅️ Please provide on the left hand panel the **Audit {metric_name.title()} Rate** and **Audit Size**.
     """
 
     return text

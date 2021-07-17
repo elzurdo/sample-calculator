@@ -35,6 +35,7 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
     xmax_ = np.min([p_success.max(), ci_max * 1.05])
     if xmax is not None:
         xmax_ = np.max([xmax_, xmax])
+        xmax_ = np.min([xmax_, 1.])
 
 
 
