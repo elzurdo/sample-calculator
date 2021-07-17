@@ -20,7 +20,7 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
                        color="purple", format='-', label=None, fill=False, display_ci=True,
                        alpha=1., factor=1., ci_label=None,
                        xlabel="success rate",
-                       ylabel="probability distribution function"):
+                       ylabel="probability distribution function", xmin=None, xmax=None):
 
     ci_min, ci_max = successes_failures_to_ci_min_max(success, failure, ci_type=ci_type, ci_fraction=ci_fraction)
 
@@ -29,10 +29,16 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
 
     plt.plot(p_success, beta_pdf * factor, format, linewidth=3, color=color, label=label, alpha=alpha)
 
-    xmin = np.max([p_success.min(), ci_min * 0.95])
-    xmax = np.min([p_success.max(), ci_max * 1.05])
+    xmin_ = np.max([p_success.min(), ci_min * 0.95])
+    if xmin is not None:
+        xmin_ = np.min([xmin_, xmin])
+    xmax_ = np.min([p_success.max(), ci_max * 1.05])
+    if xmax is not None:
+        xmax_ = np.max([xmax_, xmax])
 
-    plt.xlim(xmin, xmax)
+
+
+    plt.xlim(xmin_, xmax_)
 
     if display_ci == True:
         plt.plot([ci_min, ci_min],
@@ -49,7 +55,7 @@ def plot_success_rates(success, failure, ci_fraction=CI_FRACTION, ci_type=CI_TYP
         plt.ylabel(ylabel)
 
 
-def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True, metric_name="success"):
+def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_type="HDI", legend_title="Interval Algorithm", ac_display=True, display_ci=True, metric_name="success", xmin=None, xmax=None):
     ci_type_str = "High Density"
     if "ET" == ci_type_str:
         ci_type_str = "Jeffreys"
@@ -57,7 +63,7 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
     plot_success_rates(audit_success_rate * audit_size,
                      (1 - audit_success_rate) * audit_size,
                      ci_fraction=ci_fraction, ci_label=f"{ci_type_str} {ci_fraction * 100.:0.1f}% CI", label="Posterior", ci_type=ci_type,
-                       xlabel=f"model {metric_name} rate", display_ci=display_ci)
+                       xlabel=f"model {metric_name} rate", display_ci=display_ci, xmin=xmin, xmax=xmax)
 
     # Agresti-Coull
     if ac_display:
@@ -72,7 +78,10 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
     ax.grid(alpha=0.3)
 
 
-def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=SUCCESS_RATE_BOUNDARY, generator_success_rates=None, postior_method ="flat_min"):
+def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size,
+                                            success_rate_boundary=SUCCESS_RATE_BOUNDARY,
+                                            generator_success_rates=None,
+                                            postior_method ="flat_min"):
 
     if generator_success_rates is None:
         d_generator_success, generator_success_rates = get_success_rates()

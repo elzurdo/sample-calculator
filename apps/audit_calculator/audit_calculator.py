@@ -138,7 +138,7 @@ An minimum **Audit Size** of {result['sample_size']} is required to measure a **
 elif option_clearance == calculator_type:
 
     success_rate_boundary_percent = st.sidebar.number_input(f'Model min {metric_name.title()} Rate (%)',
-                                                            value=93.0, min_value=90.,
+                                                            value=93.0, min_value=50.,
                                                             max_value=99.)
 
     success_rate_boundary = success_rate_boundary_percent / 100.
@@ -244,7 +244,7 @@ Please adjust either the **Risk Factor** or the **Audit {metric_name_title} Rate
         display_ci = st.sidebar.checkbox('High Density 95% Credible Interval', value=False)
 
         plot_boundary_true_false_positive_rates(observed_success_rate, sample_size, success_rate_boundary=success_rate_boundary)
-        plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci, metric_name=metric_name)
+        plot_success_rates_methods(observed_success_rate, sample_size, ci_fraction, ci_type="HDI", legend_title= None, ac_display=ac_display, display_ci=display_ci, metric_name=metric_name, xmin=success_rate_boundary - 0.05)
         st.pyplot(plt.gcf())
 
 
