@@ -97,7 +97,7 @@ if option_accuracy == calculator_type:
     """
 
             benchmark_percent = st.sidebar.number_input(f'Baseline {metric_name_title} Rate (%)', value=80.,
-                                                    min_value=50.,
+                                                    min_value=1.,
                                                     max_value=99.)
             benchmark = benchmark_percent/100.
 
@@ -129,7 +129,7 @@ The minimum **Audit Size** required to measure a **{metric_name_title} Rate** of
         #st.write(utils_text.plan_accuracy_header(metric_name=metric_name))
         observed_success_percent = st.sidebar.number_input(
             f'Audit {metric_name_title} Rate (%)', value=80.,
-            min_value=30.,
+            min_value=1.,
             max_value=99.)
         observed_success_rate = observed_success_percent / 100.
 
@@ -178,7 +178,7 @@ An audit size of {sample_size:,} with a **{metric_name_title} Rate** of {observe
 elif option_clearance == calculator_type:
 
     success_rate_boundary_percent = st.sidebar.number_input(f'Model min {metric_name.title()} Rate (%)',
-                                                            value=93.0, min_value=50.,
+                                                            value=93.0, min_value=1.,
                                                             max_value=99.)
 
     success_rate_boundary = success_rate_boundary_percent / 100.
