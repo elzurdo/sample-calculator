@@ -23,13 +23,14 @@ audit_stage =  st.sidebar.selectbox('I would like to ...', [stage_landing, stage
 
 option_accuracy = "📐 determine accuracy."
 option_clearance = "⛑ ensure value clearance."
+option_comparison = "⚖️  compare two models"
 
 if stage_landing != audit_stage:
     if stage_planning == audit_stage:
         calculator_types = [option_accuracy, option_clearance]
         calc_index = 0
     elif stage_interpreting == audit_stage:
-        calculator_types = [option_accuracy, option_clearance]
+        calculator_types = [option_accuracy, option_clearance, option_comparison]
         calc_index = 0
 
     calculator_type = st.sidebar.selectbox('in order to ...', calculator_types, index=calc_index)
@@ -299,6 +300,9 @@ Please adjust either the **Risk Factor** or the **Audit {metric_name_title} Rate
     with st.beta_expander("""Importance of the Risk Factor"""):
         st.write(text_expanded_mfpr)
 
+elif option_comparison == calculator_type:
+
+    st.write(utils_text.interpret_comparison_header(metric_name=metric_name))
 
 """
 Created by: [Eyal Kazin](https://www.linkedin.com/in/eyal-kazin-0b96227a/)  

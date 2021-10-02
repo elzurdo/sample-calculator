@@ -4,8 +4,8 @@ less_equal = r"""$$\le$$"""
 def landing_header():
     text = \
     """
-    # Audit Calculators 🧮
-    **Calculate a model's performance based on audit data.**
+    # Sample Calculators 🧮
+    **Calculate a model's performance based on sampled data.**
 
     Use these calculators to:  
     * 🔬 Interpret audit results.  
@@ -46,7 +46,7 @@ def landing_instructions():
 def interpret_pass_header(success_rate_boundary, metric_name="success"):
     text = \
     f"""
-    # Audit Value Clearance Interpreter ⛑🔬️ 
+    # Sample Value Clearance Interpreter ⛑🔬️ 
     **Got data? Use this calculator to draw conclusions about clearance of {success_rate_boundary * 100.:0.1f}% {metric_name}.**
 
     This **Interpreter** calculator addresses the question:   
@@ -63,15 +63,31 @@ def interpret_pass_header(success_rate_boundary, metric_name="success"):
 def interpret_accuracy_header(ci_fraction, metric_name="success"):
     text = \
     f"""
-    # Audit Accuracy Interpreter 📐🔬️ 
-    **Got data? Use this calculator to assess the  {ci_fraction * 100.:0.1f}% Credible Interval of {metric_name}.**
+    # Sample Accuracy Interpreter 📐🔬️ 
+    **Got data? Use this calculator to assess the {ci_fraction * 100.:0.1f}% Credible Interval of {metric_name}.**
 
     This **Interpreter** calculator addresses the question:   
     “Given an **Audit Size** with an **Audit {metric_name.title()} Rate**, what is the model {metric_name} rate within a {ci_fraction * 100.:0.1f}% credible interval?”
 
 
     ### Instructions  
-    ⬅️ Please provide on the left hand panel the **Audit {metric_name.title()} Rate** and **Audit Size**.
+    ⬅️ Please provide on the left hand panel the **Sample {metric_name.title()} Rate** and **Sample Size**.
+    """
+
+    return text
+
+
+def interpret_comparison_header(metric_name="success"):
+    text = \
+    f"""
+    # Model Comparison Interpreter ⚖️🔬️ 
+    **Got data? Use this calculator to compare the performance of two models.**
+
+    This **Interpreter** calculator addresses the question:   
+    “Given sampled data of two models - how do they compare?”
+
+    ### Instructions  
+    ⬅️ Please provide on the left hand panel the **Sample {metric_name.title()} Rates** and **Sample Sizes** of Models **A** and **B**.
     """
 
     return text
@@ -79,7 +95,7 @@ def interpret_accuracy_header(ci_fraction, metric_name="success"):
 def plan_accuracy_header(metric_name="success"):
     text = \
     f"""
-    # Audit Accuracy Planner 📐💰
+    # Sample Accuracy Planner 📐💰
 
     **Plan an audit budget based on the desired accuracy.**   
 
