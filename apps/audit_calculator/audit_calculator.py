@@ -129,12 +129,12 @@ The minimum **Audit Size** required to measure a **{metric_name_title} Rate** of
     elif stage_interpreting == audit_stage:
         #st.write(utils_text.plan_accuracy_header(metric_name=metric_name))
         observed_success_percent = st.sidebar.number_input(
-            f'Audit {metric_name_title} Rate (%)', value=80.,
+            f'Sample {metric_name_title} Rate (%)', value=80.,
             min_value=1.,
             max_value=99.)
         observed_success_rate = observed_success_percent / 100.
 
-        sample_size = st.sidebar.number_input('Audit Size', value=100, min_value=MIN_AUDIT_SIZE,
+        sample_size = st.sidebar.number_input('Sample Size', value=100, min_value=MIN_AUDIT_SIZE,
                                               max_value=10000)
 
         st.write(utils_text.interpret_accuracy_header(CI_FRACTION, metric_name=metric_name))
@@ -302,7 +302,80 @@ Please adjust either the **Risk Factor** or the **Audit {metric_name_title} Rate
 
 elif option_comparison == calculator_type:
 
+    st.sidebar.write("**Model A**")
+    sample_size_a = st.sidebar.number_input('Model A Sample Size', value=100,
+                                          min_value=MIN_AUDIT_SIZE,
+                                          max_value=10000)
+
+    observed_success_percent_a = st.sidebar.number_input(
+        f'Model A Sample {metric_name_title} Rate (%)', value=80.,
+        min_value=1.,
+        max_value=99.)
+    observed_success_rate_a = observed_success_percent_a / 100.
+    st.sidebar.write("---")
+
+    st.sidebar.write("**Model B**")
+    sample_size_b = st.sidebar.number_input('Model B Sample Size', value=150,
+                                          min_value=MIN_AUDIT_SIZE,
+                                          max_value=10000)
+
+    observed_success_percent_b = st.sidebar.number_input(
+        f'Model B Sample {metric_name_title} Rate (%)', value=75.,
+        min_value=1.,
+        max_value=99.)
+    observed_success_rate_b = observed_success_percent_b / 100.
+
     st.write(utils_text.interpret_comparison_header(metric_name=metric_name))
+
+    ci_min_a, ci_max_a = hdi_ci_limits(observed_success_rate_a, sample_size_a,
+                                   ci_fraction=CI_FRACTION)
+    ci_width_a = ci_max_a - ci_min_a
+    xmin_a = ci_min_a - ci_width_a
+    xmax_a = ci_max_a + ci_width_a
+
+    success_a = sample_size_a * observed_success_rate_a
+    failure_a = sample_size_a - success_a
+
+    plot_success_rates(success_a, failure_a,
+                       min_psuccess=xmin_a,
+                       max_psucess=xmax_a,
+                       #xmin=xmin, xmax=xmax,
+                       d_psuccess=0.0001,
+                       color="purple", format='-', label="Model A", fill=False,
+                       display_ci=True,
+                       alpha=1., factor=1., ci_label=None,
+                       xlabel=f"{metric_name} rate",
+                       ylabel="probability distribution function"
+                       )
+
+
+    ci_min_b, ci_max_b = hdi_ci_limits(observed_success_rate_b, sample_size_b,
+                                   ci_fraction=CI_FRACTION)
+    ci_width_b = ci_max_b - ci_min_b
+
+    success_b = sample_size_b * observed_success_rate_b
+    failure_b = sample_size_b - success_b
+
+    xmin_b = ci_min_b - ci_width_b
+    xmax_b = ci_max_b + ci_width_b
+
+    xmin = min([xmin_a, xmin_b])
+    xmax = max([xmax_a, xmax_b])
+
+    plot_success_rates(success_b, failure_b,
+                       min_psuccess=xmin_b,
+                       max_psucess=xmax_b,
+                       xmin=xmin, xmax=xmax,
+                       d_psuccess=0.0001,
+                       color="green", format='--', label="Model B", fill=False,
+                       display_ci=True,
+                       alpha=0.7, factor=1., ci_label=None,
+                       xlabel=f"{metric_name} rate",
+                       ylabel="probability distribution function"
+                       )
+    plt.legend()
+
+    st.pyplot(plt.gcf())
 
 """
 Created by: [Eyal Kazin](https://www.linkedin.com/in/eyal-kazin-0b96227a/)  
