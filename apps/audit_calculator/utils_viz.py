@@ -73,7 +73,7 @@ def plot_success_rates_methods(audit_success_rate, audit_size, ci_fraction, ci_t
         plt.scatter([ac_min, ac_max], [0, 0], s=100., marker="^", color="orange", label=f"Agresti-Coull {ci_fraction * 100.:0.1f}% CI")
 
     plt.legend(title=legend_title)
-    plt.title(f"Audit: Size={int(audit_size):,}, {metric_name.title()} Rate {audit_success_rate * 100:0.1f}%")
+    plt.title(f"Sample: Size={int(audit_size):,}, {metric_name.title()} Rate {audit_success_rate * 100:0.1f}%")
 
     ax = plt.gca()
     #grid
@@ -130,7 +130,7 @@ def plot_boundary_true_false_positive_rates(observed_success_rate, sample_size,
                      hatch="x")
 
     plt.title(
-        f"audit of size {sample_size:,} success rate {observed_success_rate * 100:0.1f}%")
+        f"sample of size {sample_size:,} success rate {observed_success_rate * 100:0.1f}%")
     plt.xlabel("model success rate")
     plt.ylabel("probability distribution function")
 
@@ -173,7 +173,7 @@ def plot_metric_accuracy(precisions = [0.05, 0.06, 0.07, 0.08, 0.09, 0.1], d_sam
 
     plt.legend(title="accuracy (95% CI)", bbox_to_anchor=(1, 1))
     plt.xlabel("success rate")
-    plt.ylabel("audit size")
+    plt.ylabel("sample size")
 
     ax = plt.gca()
     # grid

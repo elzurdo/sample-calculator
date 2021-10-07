@@ -211,7 +211,7 @@ def sample_size_success_precision(d_sample_size = 10, min_size = 20, max_size = 
     df_precision = pd.DataFrame(rate_to_precision)
     df_precision.index = sample_sizes
     df_precision.columns.name = "success_rate"
-    df_precision.index.name = "audit_size"
+    df_precision.index.name = "sample_size"
 
     return df_precision
 
